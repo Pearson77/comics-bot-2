@@ -1,8 +1,13 @@
-TOKEN: str = ""
+TOKEN: str = "6485456172:AAGTuQL0xv98aOqtsiOO2okDpfYiShDdQMU"
 
-DICT = {
-    "no_files": "",
-    "created": "",
-    "send_photos": "",
-    "must_text": "",
+DICT: dict = {
+    "no_files": "Нужно отправить хотя бы одну картинку комикса!",
+    "created": "Комикс успешно создан! Используйте /comics",
+    "send_name": "Укажите название комикса...",
+    "send_photos": "Отправьте картинки комикса...",
+    "must_text": "Вы должны указать название комикса!",
+    "no_comics": "В данный момент нет комиксов!",
+    "choose_for_read": "Выберите комикс для прочтения:",
+    "choose_for_delete": "Выберите комикс для удаления:",
+    "deleted": "Комикс успешно удалён!",
 }

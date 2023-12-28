@@ -24,3 +24,21 @@ class DB:
     def delete_comics(comics_name: str):
         with Connection() as c:
             c.execute(F"DROP TABLE {comics_name}")
+
+    @staticmethod
+    def get_comics_len(comics_name: str):
+        with Connection() as c:
+            result = c.execute(F"SELECT COUNT(rowid) FROM {comics_name}").fetchone()
+        return result[0]
+
+    @staticmethod
+    def get_page_by_number(comics_name: str, page: int):
+        with Connection() as c:
+            result = c.execute(F"SELECT file_id FROM {comics_name} WHERE rowid = '{page}'").fetchone()
+        return result[0]
+
+    @staticmethod
+    def get_comics_all_names():
+        with Connection() as c:
+            result = c.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+        return list(map(lambda element: element[0], result)) if result else []
