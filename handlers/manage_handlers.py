@@ -1,15 +1,10 @@
 from aiogram import F, Router
 from aiogram.filters import Command, StateFilter
-from aiogram.types import Message, CallbackQuery, InputMediaPhoto
+from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
-from keyboard import (
-    create_page_keyboard,
-    create_comics_keyboard,
-    create_delete_keyboard
-)
-
+from keyboard import create_delete_keyboard
 from database import DB
 from config import DICT
 
@@ -19,17 +14,6 @@ router = Router()
 class GetPhotos(StatesGroup):
     name = State()
     wait = State()
-
-
-@router.message(Command(commands=["start", "comics"]))
-async def send_comics_list(message: Message):
-    markup = create_comics_keyboard()
-    if not markup:
-        return await message.answer(DICT['no_comics'])
-    await message.answer(
-        text=DICT['choose_for_read'],
-        reply_markup=markup
-    )
 
 
 @router.message(Command(commands=["create"]))
@@ -81,57 +65,8 @@ async def get_photo_from_user(message: Message, state: FSMContext):
     await state.update_data(data)
 
 
-@router.callback_query(F.data.contains("to-home"))
-async def send_comics_list_by_button(callback: CallbackQuery):
-    markup = create_comics_keyboard()
-    if not markup:
-        return await callback.message.answer(DICT['no_comics'])
-    await callback.message.answer(
-        text=DICT['choose_for_read'],
-        reply_markup=markup
-    )
-    await callback.message.delete()
-
-
-@router.callback_query(F.data.contains("to-comics"))
-async def go_to_comics(callback: CallbackQuery):
-    comics_name, comics_len = callback.data.split(':')[1:]
-
-    await callback.message.answer_photo(
-        photo=DB.get_page_by_number(comics_name, 1),
-        reply_markup=create_page_keyboard(
-            comics_name=comics_name,
-            page=1,
-            pages_count=int(comics_len)
-        )
-    )
-    await callback.message.delete()
-
-
-@router.callback_query(F.data.contains("to-page"))
-async def go_to_page(callback: CallbackQuery):
-    comics_name, page, comics_len = callback.data.split(':')[1:]
-
-    await callback.message.edit_media(
-        media=InputMediaPhoto(
-            media=DB.get_page_by_number(comics_name, page)
-        ),
-        reply_markup=create_page_keyboard(
-            comics_name=comics_name,
-            page=int(page),
-            pages_count=int(comics_len)
-        )
-    )
-    await callback.answer()
-
-
 @router.callback_query(F.data.contains("delete"))
 async def delete_comics_by_button(callback: CallbackQuery):
     DB.delete_comics(callback.data.split(':')[1])
     await callback.answer(DICT['deleted'])
-
-
-@router.callback_query()
-async def delete_comics_by_button(callback: CallbackQuery):
-    # Отлавливаю пустые, либо непредвиденные колбеки
-    await callback.answer()
+    await callback.message.delete()
