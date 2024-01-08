@@ -49,6 +49,8 @@ async def stop_handling_photos(message: Message, state: FSMContext):
 
     if 'file_ids' not in data:
         return await message.reply(DICT['no_files'])
+    if "'" in data or '"' in data:
+        return await message.reply(DICT['symbols'])
 
     DB.create_comics(**data)
     await message.answer(DICT['created'])
